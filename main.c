@@ -23,19 +23,12 @@ __internal_syscall(long n, long _a0, long _a1, long _a2, long _a3, long _a4, lon
 
 
 int foo(int a, int b) {
-    return a+b;
+    float x = (float)a / (float)b;
+    return (int)x;
 }
 
-long test(int a, int b) {
-    return __internal_syscall(1,0,0,0,0,0,0);
-}
-
-int _start() {
-    //syscall(1);
-    //asm("mv a0, a5");
-    int x = foo(1,2);
-    foo(x,3);
+void _start() {
+    foo(1,3);
     
-
-    return test(1,2);
+    __internal_syscall(60, 0, 0, 0, 0, 0, 0);
 }
