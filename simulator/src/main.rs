@@ -25,7 +25,7 @@ fn main() {
     let mut mem = Memory::new(&binary, &binary_blob);
     println!("{:?}", mem);
 
-    for k in 0..20 {
+    for k in 0..40 {
         let inst = mem.read(mem.get_entry_point() + k * 4, 4);
         //println!("{:#X?}", inst);
 

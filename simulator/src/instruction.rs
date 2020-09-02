@@ -54,7 +54,7 @@ const MASK_11_0_EXTEND: u32 = MASK_LUI_IMM;
 impl Instruction {
     pub fn new(inst: u32) -> Self {
         let op = inst & MASK_OP;
-        //println!("{:032b}", (u32::MAX & (0b1111111111 << 21)) >> 20);
+        //println!("{:032b}", ((u32::MAX & (0b111111 << 25)) >> 20));
         //println!("{:032b}", (u32::MAX & (0b0 << 21) | (1 << 20)) >> 9);
         //println!("{:032b}", (1u32 << 31) >> (31 - 12));
         //println!("{:032b}", (u32::MAX & (0b1111 << 8)) >> 0);
@@ -206,6 +206,7 @@ impl Instruction {
             0b0110011 => {
                 // ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND
                 let func7 = get_func7(inst);
+                //println!("{:07X}", func7);
                 let func3 = get_func3(inst);
                 let rs1 = get_rs1(inst);
                 let rs2 = get_rs2(inst);
@@ -268,7 +269,7 @@ fn get_func3(inst: u32) -> u8 {
 }
 
 fn get_func7(inst: u32) -> u8 {
-    ((inst & (0b1111111 << 25)) >> 20) as u8
+    ((inst & (0b1111111 << 25)) >> 25) as u8
 }
 
 fn get_b_imm(inst: u32) -> u32 {

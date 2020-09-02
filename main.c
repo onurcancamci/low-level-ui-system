@@ -36,5 +36,20 @@ void test() {
 void _start() {
     foo(1,3);
     char* asd = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; 
+    int a = 1;
+    int b = 2;
+    int c = a + b;
+    int d = a << b;
+    int e = a >> b;
+    if(a == 0) {
+        int f = a - b;
+    }
+    if (a != 0) {
+        int g = a ^ b;
+    }
+    if (a < b) {
+        int h = a & b;
+    }
+
     __internal_syscall(60, 0, 0, 0, 0, 0, 0);
 }
