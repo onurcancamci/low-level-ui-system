@@ -19,7 +19,7 @@ __internal_syscall(long n, long _a0, long _a1, long _a2, long _a3, long _a4, lon
 }
 
 
-
+int x = 42;
 
 
 int foo(int a, int b) {
@@ -27,8 +27,14 @@ int foo(int a, int b) {
     return (int)x;
 }
 
+void test() {
+    int a = 0;
+    int b = -1048596;
+    int c = a + (-1);
+}
+
 void _start() {
     foo(1,3);
-    
+    char* asd = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; 
     __internal_syscall(60, 0, 0, 0, 0, 0, 0);
 }

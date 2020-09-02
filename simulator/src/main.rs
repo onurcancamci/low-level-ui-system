@@ -1,6 +1,12 @@
 use elfloader::ElfBinary;
 use std::fs;
 
+mod instruction;
+mod memory;
+mod util;
+
+use memory::Memory;
+
 fn main() {
     let binary_blob = fs::read("../main").unwrap();
     let binary = ElfBinary::new("main", binary_blob.as_slice()).unwrap();
@@ -15,4 +21,10 @@ fn main() {
         "{:08b} {:08b} {:08b} {:08b}",
         inst[3], inst[2], inst[1], inst[0]
     );
+
+    let mut mem = Memory::new(&binary, &binary_blob);
+    println!("{:?}", mem);
+
+    let inst = mem.read(mem.get_entry_point(), 4);
+    println!("{:#X?}", inst);
 }
