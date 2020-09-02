@@ -25,11 +25,13 @@ fn main() {
     let mut mem = Memory::new(&binary, &binary_blob);
     println!("{:?}", mem);
 
-    let inst = mem.read(mem.get_entry_point(), 4);
-    println!("{:#X?}", inst);
+    for k in 0..20 {
+        let inst = mem.read(mem.get_entry_point() + k * 4, 4);
+        //println!("{:#X?}", inst);
 
-    let inst_u32 = util::to_u32(inst);
-    let inst_enum = instruction::Instruction::new(inst_u32);
+        let inst_u32 = util::to_u32(inst);
+        let inst_enum = instruction::Instruction::new(inst_u32);
 
-    println!("{:#?}", inst_enum);
+        println!("{:#?}", inst_enum);
+    }
 }

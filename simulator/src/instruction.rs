@@ -40,31 +40,34 @@ pub(crate) enum Instruction {
     SRA { rs1: u8, rs2: u8, rd: u8 }, // rs1 >> rs2[4:0] -> rd (arithmetic)
     OR { rs1: u8, rs2: u8, rd: u8 }, // rs1 | rs2 -> rd
     AND { rs1: u8, rs2: u8, rd: u8 }, // rs1 & rs2 -> rd
-    FENCE { rs1: u8, rd: u8, fm: u8, pred: u8, succ: u8 },
+    //FENCE { rs1: u8, rd: u8, fm: u8, pred: u8, succ: u8 },
     ECALL,
     EBREAK,
 }
 
-const mask_op: u32 = 0b1111111;
-const mask_lui_imm: u32 = 0b11111111111111111111000000000000;
-const mask_rd: u32 = 0b111110000000;
-const mask_sign: u32 = 1 << 31;
-const mask_jarl_imm: u32 = 0b111111111111 << 20;
-const mask_11_0: u32 = 0b111111111111 << 20;
-const mask_11_0_extend: u32 = mask_lui_imm;
+const MASK_OP: u32 = 0b1111111;
+const MASK_LUI_IMM: u32 = 0b11111111111111111111000000000000;
+const MASK_RD: u32 = 0b111110000000;
+const MASK_11_0: u32 = 0b111111111111 << 20;
+const MASK_11_0_EXTEND: u32 = MASK_LUI_IMM;
 
 impl Instruction {
     pub fn new(inst: u32) -> Self {
-        let op = inst & mask_op;
+        let op = inst & MASK_OP;
         //println!("{:032b}", (u32::MAX & (0b1111111111 << 21)) >> 20);
         //println!("{:032b}", (u32::MAX & (0b0 << 21) | (1 << 20)) >> 9);
         //println!("{:032b}", (1u32 << 31) >> (31 - 12));
         //println!("{:032b}", (u32::MAX & (0b1111 << 8)) >> 0);
-        println!("{:032b}", 0b11111111111111111111 << 12);
+        //println!("{:032b}", inst);
+        //let bytes = inst.to_le_bytes();
+        //println!(
+        //    "0x{:02X}{:02X}{:02X}{:02X}",
+        //    bytes[0], bytes[1], bytes[2], bytes[3]
+        //);
         match op {
             0b0110111 => {
                 // LUI
-                let imm = inst & mask_lui_imm;
+                let imm = inst & MASK_LUI_IMM;
                 let rd = get_rd(inst);
                 Instruction::LUI {
                     rd,
@@ -73,7 +76,7 @@ impl Instruction {
             }
             0b0010111 => {
                 // AUIPC
-                let imm = inst & mask_lui_imm;
+                let imm = inst & MASK_LUI_IMM;
                 let rd = get_rd(inst);
                 Instruction::AUIPC {
                     rd,
@@ -245,18 +248,18 @@ impl Instruction {
 }
 
 fn get_rd(inst: u32) -> u8 {
-    let masked = inst & mask_rd;
+    let masked = inst & (0b11111 << 7);
     (masked >> 7) as u8
 }
 
 fn get_rs1(inst: u32) -> u8 {
-    let masked = inst & (0b11111 << 16);
-    (masked >> 16) as u8
+    let masked = inst & (0b11111 << 15);
+    (masked >> 15) as u8
 }
 
 fn get_rs2(inst: u32) -> u8 {
-    let masked = inst & (0b11111 << 21);
-    (masked >> 21) as u8
+    let masked = inst & (0b11111 << 20);
+    (masked >> 20) as u8
 }
 
 fn get_func3(inst: u32) -> u8 {
@@ -295,9 +298,9 @@ fn get_s_imm(inst: u32) -> u32 {
 }
 
 fn get_imm_11_0(inst: u32) -> u32 {
-    let mut base = (inst & mask_11_0) >> 20;
+    let mut base = (inst & MASK_11_0) >> 20;
     if (inst & (1 << 31)) != 0 {
-        let ext = mask_11_0_extend;
+        let ext = MASK_11_0_EXTEND;
         base = base | ext;
     }
     base
