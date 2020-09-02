@@ -1,4 +1,4 @@
-pub fn to_u32(buf: &[u8; 4]) -> u32 {
+pub fn to_u32(buf: &[u8]) -> u32 {
     let mut val = [0u8; 4];
     val.clone_from_slice(buf);
     u32::from_le_bytes(val)

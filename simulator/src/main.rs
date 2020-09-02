@@ -27,4 +27,9 @@ fn main() {
 
     let inst = mem.read(mem.get_entry_point(), 4);
     println!("{:#X?}", inst);
+
+    let inst_u32 = util::to_u32(inst);
+    let inst_enum = instruction::Instruction::new(inst_u32);
+
+    println!("{:#?}", inst_enum);
 }
