@@ -52,6 +52,9 @@ impl Memory {
     }
 
     pub fn set_register(&mut self, val: u32, ind: u8) {
+        if ind == 0 {
+            return;
+        }
         self.registers[ind as usize] = val;
     }
 

@@ -264,6 +264,7 @@ impl Processor {
             }
             ECALL => {
                 println!("ECALL RECEIVED");
+                std::process::exit(0);
             }
             EBREAK => println!("EBREAK RECEIVED"),
         }

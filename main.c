@@ -22,11 +22,6 @@ __internal_syscall(long n, long _a0, long _a1, long _a2, long _a3, long _a4, lon
 int x = 42;
 
 
-int foo(int a, int b) {
-    float x = (float)a / (float)b;
-    return (int)x;
-}
-
 void test() {
     int a = 0;
     int b = -1048596;
@@ -34,7 +29,6 @@ void test() {
 }
 
 void _start() {
-    foo(1,3);
     char* asd = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"; 
     int a = 1;
     int b = 2;

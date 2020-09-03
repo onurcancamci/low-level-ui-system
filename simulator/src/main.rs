@@ -53,7 +53,7 @@ fn main() {
     }
     println!("--------------------------");
 
-    for k in 0..50 {
+    for k in 0..500 {
         Processor::tick(&mut mem);
     }
 }
