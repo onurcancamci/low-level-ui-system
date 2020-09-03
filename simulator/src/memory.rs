@@ -1,18 +1,13 @@
 use elfloader::ElfBinary;
 
-const ZERO: usize = 0;
-const RA: usize = 1;
 const SP: usize = 2;
-const GP: usize = 3;
-const TP: usize = 4;
-const FP: usize = 8;
 
 #[derive(Debug)]
 pub(crate) struct Memory {
     _start: usize,
     segments: Vec<MemorySegment>,
-    pub registers: [u32; 32],
-    pub pc: u32,
+    registers: [u32; 32],
+    pc: u32,
 }
 
 #[derive(Debug)]
@@ -40,13 +35,44 @@ impl Memory {
                 content,
             });
         }
-
-        Memory {
+        //stack
+        segments.push(MemorySegment {
+            start: 2143289328usize,
+            size: 2usize.pow(22),
+            content: vec![0u8; 2usize.pow(22)],
+        });
+        let mut mem = Memory {
             segments,
             _start: binary.entry_point() as usize,
             registers: [0u32; 32],
             pc: binary.entry_point() as u32,
-        }
+        };
+        mem.registers[SP] = 2143289328 + 2u32.pow(22);
+        mem
+    }
+
+    pub fn set_register(&mut self, val: u32, ind: u8) {
+        self.registers[ind as usize] = val;
+    }
+
+    pub fn get_register(&self, ind: u8) -> u32 {
+        self.registers[ind as usize]
+    }
+
+    pub fn set_pc(&mut self, val: u32) {
+        self.pc = val;
+    }
+
+    pub fn get_pc(&self) -> u32 {
+        self.pc
+    }
+
+    pub fn incr_pc(&mut self) {
+        self.pc += 4;
+    }
+
+    pub fn get_instr(&self) -> &[u8] {
+        self.read(self.pc as usize, 4)
     }
 
     pub fn get_entry_point(&self) -> usize {

@@ -3,9 +3,12 @@ use std::fs;
 
 mod instruction;
 mod memory;
+mod processor;
 mod util;
 
 use memory::Memory;
+use processor::Processor;
+use util::*;
 
 fn main() {
     let binary_blob = fs::read("../main").unwrap();
@@ -22,10 +25,24 @@ fn main() {
         inst[3], inst[2], inst[1], inst[0]
     );
 
-    let mut mem = Memory::new(&binary, &binary_blob);
-    println!("{:?}", mem);
+    println!("{:08b} {:08b} {:08b} {:08b}", 0x00, 0xfa, 0xff, 0xff);
+    println!(
+        "{} {} {}",
+        0xfa & (1 << 7),
+        to_u32(&[0x00, 0xfa, 0xff, 0xff]) as i32,
+        0xfa00u16 as i16
+    );
+    let bytes = from_u32(1);
+    let val = to_u32(&bytes);
+    println!(
+        "{:08b} {:08b} {:08b} {:08b}",
+        bytes[0], bytes[1], bytes[2], bytes[3]
+    );
+    println!("{}", val);
 
-    for k in 0..40 {
+    let mut mem = Memory::new(&binary, &binary_blob);
+    //println!("{:?}", mem);
+    for k in 0..0 {
         let inst = mem.read(mem.get_entry_point() + k * 4, 4);
         //println!("{:#X?}", inst);
 
@@ -33,5 +50,10 @@ fn main() {
         let inst_enum = instruction::Instruction::new(inst_u32);
 
         println!("{:#?}", inst_enum);
+    }
+    println!("--------------------------");
+
+    for k in 0..50 {
+        Processor::tick(&mut mem);
     }
 }

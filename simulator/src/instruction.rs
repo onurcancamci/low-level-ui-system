@@ -2,7 +2,7 @@
 #[derive(Debug)]
 pub(crate) enum Instruction {
     LUI { imm: i32, rd: u8 },            // Load Upper Immediate
-    AUIPC { imm: i32, rd: u8 },          // LUI for PC and stores Result in the 'rd'
+    AUIPC { imm: i32, rd: u8 },          
     JAL { imm: i32, rd: u8 }, // Jump relative to current instruction address. Stores next address in 'rd'. (PC+4)(Not jump location)
     JALR { imm: i32, rd: u8, rs1: u8 }, // Same as JAL but jump to 'rs1' + 'imm'
     BEQ { imm: i32, rs1: u8, rs2: u8 }, // if rs1 == rs2 : jump
