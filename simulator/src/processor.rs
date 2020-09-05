@@ -2,13 +2,20 @@ pub(crate) struct Processor;
 
 use crate::instruction::Instruction;
 use crate::memory::Memory;
+use crate::syscall::Syscall;
 use crate::util::*;
 
 impl Processor {
     pub fn tick(mem: &mut Memory) {
         use Instruction::*;
         let inst = Processor::fetch(mem);
-        println!("{:#?}", inst);
+        if mem.debug {
+            let pc_bytes = from_u32(mem.get_pc());
+            println!(
+                "0x{:02X}{:02X}{:02X}{:02X} {:#?}",
+                pc_bytes[3], pc_bytes[2], pc_bytes[1], pc_bytes[0], inst
+            );
+        }
         match inst {
             LUI { imm, rd } => {
                 mem.set_register(imm as u32, rd);
@@ -76,6 +83,7 @@ impl Processor {
                 let ext = if sign == 0 { 0u8 } else { 0xffu8 };
                 let new_bytes = [bytes[0], ext, ext, ext];
                 let val = to_u32(&new_bytes);
+                //println!("lb bytes {} {}", bytes[0], val);
                 mem.set_register(val, rd);
                 mem.incr_pc();
             }
@@ -85,6 +93,7 @@ impl Processor {
                 let ext = if sign == 0 { 0u8 } else { 0xffu8 };
                 let new_bytes = [bytes[0], bytes[1], ext, ext];
                 let val = to_u32(&new_bytes);
+                //println!("lh bytes {} {} {} {}", bytes[0], bytes[1], val, ext);
                 mem.set_register(val, rd);
                 mem.incr_pc();
             }
@@ -96,14 +105,15 @@ impl Processor {
             }
             LBU { imm, rs1, rd } => {
                 let bytes = mem.read((mem.get_register(rs1) as i32 + imm) as usize, 1);
-                let new_bytes = [0, 0, 0, bytes[0]];
+                let new_bytes = [bytes[0], 0, 0, 0];
                 let val = to_u32(&new_bytes);
+                //println!("lbu bytes {} {}", bytes[0], val);
                 mem.set_register(val, rd);
                 mem.incr_pc();
             }
             LHU { imm, rs1, rd } => {
                 let bytes = mem.read((mem.get_register(rs1) as i32 + imm) as usize, 2);
-                let new_bytes = [0, 0, bytes[0], bytes[1]];
+                let new_bytes = [bytes[0], bytes[1], 0, 0];
                 let val = to_u32(&new_bytes);
                 mem.set_register(val, rd);
                 mem.incr_pc();
@@ -263,10 +273,33 @@ impl Processor {
                 mem.incr_pc();
             }
             ECALL => {
-                println!("ECALL RECEIVED");
-                std::process::exit(0);
+                let code = mem.get_register(17);
+                //println!("ECALL RECEIVED {} {}", code, mem.get_register(10));
+                let ret = Syscall::call(
+                    mem,
+                    code as i32,
+                    [
+                        mem.get_register(10) as i32,
+                        mem.get_register(11) as i32,
+                        mem.get_register(12) as i32,
+                        mem.get_register(13) as i32,
+                        mem.get_register(14) as i32,
+                        mem.get_register(15) as i32,
+                        mem.get_register(16) as i32,
+                    ],
+                );
+                mem.set_register(ret as u32, 10);
+                mem.incr_pc();
             }
-            EBREAK => println!("EBREAK RECEIVED"),
+            EBREAK => {
+                println!("EBREAK RECEIVED");
+                mem.debug = !mem.debug;
+                mem.incr_pc();
+            }
+            FENCE => {
+                // do nothing
+                mem.incr_pc();
+            }
         }
     }
 

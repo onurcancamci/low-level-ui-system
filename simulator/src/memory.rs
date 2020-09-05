@@ -1,4 +1,5 @@
 use elfloader::ElfBinary;
+use std::sync::RwLock;
 
 const SP: usize = 2;
 
@@ -8,6 +9,7 @@ pub(crate) struct Memory {
     segments: Vec<MemorySegment>,
     registers: [u32; 32],
     pc: u32,
+    pub debug: bool,
 }
 
 #[derive(Debug)]
@@ -46,6 +48,7 @@ impl Memory {
             _start: binary.entry_point() as usize,
             registers: [0u32; 32],
             pc: binary.entry_point() as u32,
+            debug: false,
         };
         mem.registers[SP] = 2143289328 + 2u32.pow(22);
         mem

@@ -40,7 +40,7 @@ pub(crate) enum Instruction {
     SRA { rs1: u8, rs2: u8, rd: u8 }, // rs1 >> rs2[4:0] -> rd (arithmetic)
     OR { rs1: u8, rs2: u8, rd: u8 }, // rs1 | rs2 -> rd
     AND { rs1: u8, rs2: u8, rd: u8 }, // rs1 & rs2 -> rd
-    //FENCE { rs1: u8, rd: u8, fm: u8, pred: u8, succ: u8 },
+    FENCE , // Unnecessary because every operation is in order
     ECALL,
     EBREAK,
 }
@@ -230,7 +230,7 @@ impl Instruction {
             }
             0b0001111 => {
                 // FENCE
-                unimplemented!()
+                Instruction::FENCE
             }
             0b1110011 => {
                 // ECALL, EBREAK
