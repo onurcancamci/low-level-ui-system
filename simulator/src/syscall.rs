@@ -21,6 +21,14 @@ impl Syscall {
                 print!("{}", args[0] as u8 as char);
                 1
             }
+            503 => {
+                //malloc
+                mem.malloc(args[0] as usize, 0) as i32
+            }
+            504 => {
+                //free
+                mem.free(args[0] as u32) as i32
+            }
             _ => -1,
         }
     }

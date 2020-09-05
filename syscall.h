@@ -7,6 +7,8 @@ __internal_syscall(long n, long _a0, long _a1, long _a2, long _a3, long _a4, lon
 #define EXIT 500
 #define PRINT_NUM 501
 #define PUT_CHAR 502
+#define MALLOC 503
+#define FREE 504
 
 void exit(int code) {
     __internal_syscall(EXIT, code, 0, 0, 0, 0, 0);
@@ -28,7 +30,13 @@ int puts(char* ptr) {
     return ct;
 }
 
+void *malloc(long size) {
+    return (void*)__internal_syscall(MALLOC, size, 0,0,0,0,0);
+}
 
+int free(void* ptr) {
+    return __internal_syscall(FREE, (long)ptr, 0,0,0,0,0);
+}
 
 
 

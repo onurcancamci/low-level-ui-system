@@ -17,6 +17,7 @@ pub(crate) struct MemorySegment {
     start: usize,
     size: usize,
     content: Vec<u8>,
+    persistent: bool,
 }
 
 impl Memory {
@@ -35,6 +36,7 @@ impl Memory {
                 start,
                 size,
                 content,
+                persistent: true,
             });
         }
         //stack
@@ -42,6 +44,7 @@ impl Memory {
             start: 2143289328usize,
             size: 2usize.pow(22),
             content: vec![0u8; 2usize.pow(22)],
+            persistent: true,
         });
         let mut mem = Memory {
             segments,
@@ -81,10 +84,6 @@ impl Memory {
         self.read(self.pc as usize, 4)
     }
 
-    pub fn get_entry_point(&self) -> usize {
-        self._start
-    }
-
     pub fn read(&self, start: usize, len: usize) -> &[u8] {
         let segment = self
             .segments
@@ -103,5 +102,52 @@ impl Memory {
             .expect("Invalid Memory Segment");
         let content_start = start - segment.start;
         &mut segment.content[content_start..(content_start + len)]
+    }
+
+    pub fn malloc(&mut self, size: usize, init: u8) -> u32 {
+        let last = self.segments.last().unwrap();
+        let mut last_end = last.start + last.size;
+        match last_end % 4 {
+            0 => {}
+            1 => {
+                last_end += 3;
+            }
+            2 => {
+                last_end += 2;
+            }
+            3 => {
+                last_end += 1;
+            }
+            _ => unreachable!(),
+        };
+        let seg = MemorySegment {
+            start: last_end,
+            size: size,
+            content: vec![init; size],
+            persistent: false,
+        };
+        self.segments.push(seg);
+        last_end as u32
+    }
+
+    pub fn free(&mut self, start: u32) -> u8 {
+        let seg = self
+            .segments
+            .iter()
+            .enumerate()
+            .find(|(i, s)| s.start == start as usize);
+        let i = match seg {
+            Some((
+                i,
+                MemorySegment {
+                    persistent: false, ..
+                },
+            )) => i,
+            _ => {
+                return 1;
+            }
+        };
+        self.segments.remove(i);
+        0
     }
 }

@@ -5,6 +5,13 @@ void _start() {
     //asm("ebreak");
     //asm("ebreak");
     short b = puts(ptr);
-    print_number(b);
+
+    int* arr = (int*)malloc(10);
+    arr[0] = 1;
+    arr[1] = 2;
+    print_number(arr[0]);
+    print_number(arr[1]);
+
+    free(arr);
     exit(0);
 }
