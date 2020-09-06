@@ -13,15 +13,12 @@ use memory::Memory;
 use util::*;
 
 fn main() {
-    //let bytes = [1u8];
-    //let new_b = [bytes[0], 0, 0, 0];
-    //let x = 1u32;
-    //let xb = from_u32(x);
-    //println!("{}", to_u32(&new_b));
-    //println!("{:?}", xb);
-
     let binary_blob = fs::read("../main").unwrap();
     let binary = ElfBinary::new("main", binary_blob.as_slice()).unwrap();
+    //binary
+    //    .for_each_symbol(|e| println!("{}", e.name()))
+    //    .unwrap();
+    // TODO: Init GP register with value in the symbol table
     let mem = Memory::new(&binary, &binary_blob);
     let mut machine = Machine::new(mem);
     machine.run();
